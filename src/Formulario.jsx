@@ -82,20 +82,13 @@ function Formulario() {
 
     const textoCompleto = [
       `Por la presente, yo, ${nombre}, en pleno uso de mis facultades, declaro que participo voluntariamente en la actividad "La Ruta de las Iglesias" organizada por de TVentas. Entiendo y acepto que mi participación en esta actividad es voluntaria y bajo mi propio riesgo.`,
-
       `Reconozco que HALEON no es responsable de ningún daño, lesión o efecto adverso que pueda resultar del uso de VOLTAREN durante o después de la actividad. Entiendo que es mi responsabilidad consultar con un profesional de la salud antes de VOLTAREN, especialmente en caso de tener condiciones médicas preexistentes o de estar usando otros medicamentos o productos que pudiesen interferir con el uso de VOLTAREN.`,
-
       `Al firmar este documento, libero a HALEON, sus empleados, agentes, representantes y afiliados de cualquier responsabilidad por reclamaciones, demandas, daños o acciones legales que puedan surgir en relación con mi participación en la actividad y el uso y aplicación de VOLTAREN.`,
-
       `Además, el suscrito en pleno uso de mis facultades, otorgo mi consentimiento libre, previo, expreso e informado a Haleon, para que realice el tratamiento de mis datos personales exclusivamente para efectos de llevar el registro de las liberaciones de responsabilidad de los suscritas por los participantes en el marco de la actividad "La Ruta de las Iglesias".`,
-
       `Para lo cual se entenderá como “Datos Personales Recopilados”:  a) Nombre completo y b) Número de identificación. Haleon se compromete a almacenar los datos personales de manera segura y a implementar las medidas técnicas y organizativas necesarias para protegerlos contra el acceso no autorizado, pérdida o destrucción.`,
-
       `Como titular de los datos, tengo derecho a acceder, rectificar u oponerme al tratamiento de mis datos personales, conforme a la legislación vigente. Para ejercer estos derechos, puedo comunicarme a través de ${contacto}.`,
-
       `La autorización para el tratamiento de mis datos personales se mantendrá vigente mientras sea necesario para cumplir con las finalidades mencionadas.`,
-
-      `Confirmo que he leído y comprendido completamente los términos de esta liberación de responsabilidad, que conozco de las precauciones y advertencias del producto, y, que conozco que el producto es clasificado como medicamento. En virtud de lo anterior firmo de manera voluntaria y consciente esta liberación de responsabilidad.`,
+      `Confirmo que he leído y comprendido completamente los términos de esta liberación de responsabilidad, que conozco de las precauciones y advertencias del producto, y, que conozco que el producto es clasificado como medicamento. En virtud de lo anterior firmo de manera voluntaria y consciente esta liberación de responsabilidad.`
     ];
 
     textoCompleto.forEach(parrafo => {
@@ -107,20 +100,23 @@ function Formulario() {
       y -= 10;
     });
 
-    y -= 20;
+    const nuevaPagina = pdfDoc.addPage([600, 850]);
+    let y2 = nuevaPagina.getHeight() - 100;
 
-    page.drawText(`Nombre: ${nombre}`, { x: 50, y: y, size: 12, font });
-    y -= 20;
-    page.drawText(`Cédula: ${cedula}`, { x: 50, y: y, size: 12, font });
-    y -= 20;
+    nuevaPagina.drawText(`Nombre: ${nombre}`, { x: 50, y: y2, size: 12, font });
+    y2 -= 20;
+    nuevaPagina.drawText(`Cédula: ${cedula}`, { x: 50, y: y2, size: 12, font });
+    y2 -= 20;
+    nuevaPagina.drawText(`Contacto: ${contacto}`, { x: 50, y: y2, size: 12, font });
+    y2 -= 20;
 
     const fecha = new Date().toLocaleDateString();
-    page.drawText(`Fecha: ${fecha}`, { x: 50, y: y, size: 12, font });
-    y -= 100;
+    nuevaPagina.drawText(`Fecha: ${fecha}`, { x: 50, y: y2, size: 12, font });
+    y2 -= 100;
 
-    page.drawImage(firmaEmbed, {
+    nuevaPagina.drawImage(firmaEmbed, {
       x: 200,
-      y: y,
+      y: y2,
       width: 200,
       height: 100,
     });
