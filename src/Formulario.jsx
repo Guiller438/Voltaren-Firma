@@ -7,6 +7,7 @@ import "./App.css";
 function Formulario() {
   const [nombre, setNombre] = useState("");
   const [cedula, setCedula] = useState("");
+  const [contacto, setContacto] = useState("");
   const firmaRef = useRef();
   const navigate = useNavigate();
 
@@ -34,8 +35,13 @@ function Formulario() {
   };
 
   const generarPDF = async () => {
-    if (!nombre || !cedula || firmaRef.current.isEmpty()) {
-      alert("Por favor completa tu nombre, cédula y realiza la firma.");
+    if (!nombre || !cedula || !contacto || firmaRef.current.isEmpty()) {
+      alert("Por favor completa todos los campos y realiza la firma.");
+      return;
+    }
+
+    if (contacto.length < 9) {
+      alert("Por favor ingresa un número de teléfono válido (mínimo 9 dígitos).");
       return;
     }
 
@@ -75,10 +81,21 @@ function Formulario() {
     y -= 30;
 
     const textoCompleto = [
-      `Por la presente, yo, ${nombre}, portador de la cédula ${cedula}, en pleno uso de mis facultades, declaro que participo voluntariamente en la actividad "La Ruta de las Iglesias" organizada por [INGRESAR NOMBRE DEL ORGANIZADOR]. Entiendo y acepto que mi participación en esta actividad es voluntaria y bajo mi propio riesgo.`,
-      `Reconozco que HALEON no es responsable de ningún daño, lesión o efecto adverso que pueda resultar del uso de VOLTAREN durante o después de la actividad. Entiendo que es mi responsabilidad consultar con un profesional de la salud antes de usar VOLTAREN, especialmente en caso de tener condiciones médicas preexistentes o de estar usando otros medicamentos o productos que pudiesen interferir con el uso de VOLTAREN.`,
+      `Por la presente, yo, ${nombre}, en pleno uso de mis facultades, declaro que participo voluntariamente en la actividad "La Ruta de las Iglesias" organizada por de TVentas. Entiendo y acepto que mi participación en esta actividad es voluntaria y bajo mi propio riesgo.`,
+
+      `Reconozco que HALEON no es responsable de ningún daño, lesión o efecto adverso que pueda resultar del uso de VOLTAREN durante o después de la actividad. Entiendo que es mi responsabilidad consultar con un profesional de la salud antes de VOLTAREN, especialmente en caso de tener condiciones médicas preexistentes o de estar usando otros medicamentos o productos que pudiesen interferir con el uso de VOLTAREN.`,
+
       `Al firmar este documento, libero a HALEON, sus empleados, agentes, representantes y afiliados de cualquier responsabilidad por reclamaciones, demandas, daños o acciones legales que puedan surgir en relación con mi participación en la actividad y el uso y aplicación de VOLTAREN.`,
-      `Confirmo que he leído y comprendido completamente los términos de esta liberación de responsabilidad, que conozco las precauciones y advertencias del producto, y que conozco que el producto es clasificado como medicamento. En virtud de lo anterior firmo de manera voluntaria y consciente esta liberación de responsabilidad.`,
+
+      `Además, el suscrito en pleno uso de mis facultades, otorgo mi consentimiento libre, previo, expreso e informado a Haleon, para que realice el tratamiento de mis datos personales exclusivamente para efectos de llevar el registro de las liberaciones de responsabilidad de los suscritas por los participantes en el marco de la actividad "La Ruta de las Iglesias".`,
+
+      `Para lo cual se entenderá como “Datos Personales Recopilados”:  a) Nombre completo y b) Número de identificación. Haleon se compromete a almacenar los datos personales de manera segura y a implementar las medidas técnicas y organizativas necesarias para protegerlos contra el acceso no autorizado, pérdida o destrucción.`,
+
+      `Como titular de los datos, tengo derecho a acceder, rectificar u oponerme al tratamiento de mis datos personales, conforme a la legislación vigente. Para ejercer estos derechos, puedo comunicarme a través de ${contacto}.`,
+
+      `La autorización para el tratamiento de mis datos personales se mantendrá vigente mientras sea necesario para cumplir con las finalidades mencionadas.`,
+
+      `Confirmo que he leído y comprendido completamente los términos de esta liberación de responsabilidad, que conozco de las precauciones y advertencias del producto, y, que conozco que el producto es clasificado como medicamento. En virtud de lo anterior firmo de manera voluntaria y consciente esta liberación de responsabilidad.`,
     ];
 
     textoCompleto.forEach(parrafo => {
@@ -114,10 +131,11 @@ function Formulario() {
     const formData = new FormData();
     formData.append("cedula", cedula);
     formData.append("nombres", nombre);
+    formData.append("contacto", contacto);
     formData.append("file", blob, `Liberacion_Voltaren_${nombre.replace(" ", "_")}.pdf`);
 
     try {
-      const response = await fetch("http://localhost:8000/subir-pdf", {
+      const response = await fetch("https://voltaren-firma-back.onrender.com/subir-pdf", {
         method: "POST",
         body: formData,
       });
@@ -137,7 +155,7 @@ function Formulario() {
     <div className="App">
       <img src="/voltaren.png" alt="Logo Voltaren" style={{ maxWidth: "250px", marginBottom: "1.5rem" }} />
       <h1>Liberación de Responsabilidad Voltaren</h1>
-      <p>Por favor, lee y completa la siguiente información:</p>
+      <p>Por favor, completa la siguiente información:</p>
 
       <input
         type="text"
@@ -158,20 +176,42 @@ function Formulario() {
           setCedula(soloNumeros);
         }}
       />
+      <input
+        type="text"
+        placeholder="Número de Teléfono"
+        value={contacto}
+        maxLength={10}
+        onChange={(e) => {
+          const soloNumeros = e.target.value.replace(/\D/g, "");
+          setContacto(soloNumeros);
+        }}
+      />
 
       <h3>Lee el documento antes de firmar:</h3>
       <div className="documento">
         <p>
-          Por la presente, yo, <strong>{nombre || "[Tu Nombre]"}</strong>, portador de la cédula <strong>{cedula || "[Tu Cédula]"}</strong>, en pleno uso de mis facultades, declaro que participo voluntariamente en la actividad "La Ruta de las Iglesias" organizada por [INGRESAR NOMBRE DEL ORGANIZADOR]. Entiendo y acepto que mi participación en esta actividad es voluntaria y bajo mi propio riesgo.
+          Por la presente, yo, <strong>{nombre || "[Nombre del Participante]"}</strong>, en pleno uso de mis facultades, declaro que participo voluntariamente en la actividad "La Ruta de las Iglesias" organizada por de <strong>TVentas</strong>. Entiendo y acepto que mi participación en esta actividad es voluntaria y bajo mi propio riesgo.
         </p>
         <p>
-          Reconozco que HALEON no es responsable de ningún daño, lesión o efecto adverso que pueda resultar del uso de VOLTAREN durante o después de la actividad. Entiendo que es mi responsabilidad consultar con un profesional de la salud antes de usar VOLTAREN, especialmente en caso de tener condiciones médicas preexistentes o de estar usando otros medicamentos o productos que pudiesen interferir con el uso de VOLTAREN.
+          Reconozco que HALEON no es responsable de ningún daño, lesión o efecto adverso que pueda resultar del uso de VOLTAREN durante o después de la actividad. Entiendo que es mi responsabilidad consultar con un profesional de la salud antes de VOLTAREN, especialmente en caso de tener condiciones médicas preexistentes o de estar usando otros medicamentos o productos que pudiesen interferir con el uso de VOLTAREN.
         </p>
         <p>
           Al firmar este documento, libero a HALEON, sus empleados, agentes, representantes y afiliados de cualquier responsabilidad por reclamaciones, demandas, daños o acciones legales que puedan surgir en relación con mi participación en la actividad y el uso y aplicación de VOLTAREN.
         </p>
         <p>
-          Confirmo que he leído y comprendido completamente los términos de esta liberación de responsabilidad, que conozco las precauciones y advertencias del producto, y que conozco que el producto es clasificado como medicamento. En virtud de lo anterior firmo de manera voluntaria y consciente esta liberación de responsabilidad.
+          Además, el suscrito en pleno uso de mis facultades, otorgo mi consentimiento libre, previo, expreso e informado a Haleon, para que realice el tratamiento de mis datos personales exclusivamente para efectos de llevar el registro de las liberaciones de responsabilidad de los suscritas por los participantes en el marco de la actividad "La Ruta de las Iglesias".
+        </p>
+        <p>
+          Para lo cual se entenderá como “Datos Personales Recopilados”:  a) Nombre completo y b) Número de identificación. Haleon se compromete a almacenar los datos personales de manera segura y a implementar las medidas técnicas y organizativas necesarias para protegerlos contra el acceso no autorizado, pérdida o destrucción.
+        </p>
+        <p>
+          Como titular de los datos, tengo derecho a acceder, rectificar u oponerme al tratamiento de mis datos personales, conforme a la legislación vigente. Para ejercer estos derechos, puedo comunicarme a través de <strong>{contacto || "[PROPORCIONAR DATOS DE CONTACTO, COMO UN NÚMERO DE TELÉFONO]"}</strong>.
+        </p>
+        <p>
+          La autorización para el tratamiento de mis datos personales se mantendrá vigente mientras sea necesario para cumplir con las finalidades mencionadas.
+        </p>
+        <p>
+          Confirmo que he leído y comprendido completamente los términos de esta liberación de responsabilidad, que conozco de las precauciones y advertencias del producto, y, que conozco que el producto es clasificado como medicamento. En virtud de lo anterior firmo de manera voluntaria y consciente esta liberación de responsabilidad.
         </p>
       </div>
 
