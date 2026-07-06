@@ -6,11 +6,18 @@ python-multipart==0.0.12
 # Base de datos
 psycopg2-binary==2.9.10
 
+# Variables de entorno
+python-dotenv==1.2.2
+
 # Google Drive
 google-api-python-client==2.154.0
 google-auth==2.36.0
 google-auth-httplib2==0.2.0
-google-auth-oauthlib
+google-auth-oauthlib==1.2.2
 
-# Generación de documentos
+# Generación de PDF
+reportlab==5.0.0
+pillow==11.2.1
+
+# Documentos
 python-docx==1.1.2
