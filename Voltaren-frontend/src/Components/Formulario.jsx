@@ -1,12 +1,30 @@
 import { useState } from "react";
 import Layout from "./Layout";
 
-/*
-  Paso 1: datos personales.
-  Valida localmente antes de avanzar.
-  La validación profunda de cédula la hace el backend,
-  aquí solo verificamos longitud y que sean números.
-*/
+/* Algoritmo módulo 10 — igual al que usa el backend */
+function validarCedula(cedula) {
+  if (cedula.length !== 10) return "La cédula debe tener 10 dígitos";
+  if (!/^\d+$/.test(cedula)) return "La cédula debe contener solo números";
+
+  const provincia = parseInt(cedula.slice(0, 2));
+  if (provincia < 1 || provincia > 24) return "Código de provincia inválido";
+
+  const tercero = parseInt(cedula[2]);
+  if (tercero >= 6) return "Cédula inválida";
+
+  const coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+  let total = 0;
+  for (let i = 0; i < 9; i++) {
+    let val = parseInt(cedula[i]) * coeficientes[i];
+    if (val >= 10) val -= 9;
+    total += val;
+  }
+  const verificador = (10 - (total % 10)) % 10;
+  if (verificador !== parseInt(cedula[9])) return "Cédula inválida";
+
+  return ""; // válida
+}
+
 export default function Formulario({ datos, onChange, onSiguiente }) {
   const [errores, setErrores] = useState({});
 
@@ -16,9 +34,12 @@ export default function Formulario({ datos, onChange, onSiguiente }) {
     const ced = datos.cedula.trim();
     const con = datos.contacto.trim();
 
-    if (nom.length < 3)  e.nombres  = "Ingresa tu nombre completo";
-    if (ced.length !== 10) e.cedula = "La cédula debe tener 10 dígitos";
-    if (con.length < 9)  e.contacto = "Ingresa un número de teléfono válido";
+    if (nom.length < 3) e.nombres = "Ingresa tu nombre completo";
+
+    const errorCedula = validarCedula(ced);
+    if (errorCedula) e.cedula = errorCedula;
+
+    if (con.length < 9) e.contacto = "Ingresa un número de teléfono válido";
 
     setErrores(e);
     return Object.keys(e).length === 0;
@@ -87,7 +108,6 @@ export default function Formulario({ datos, onChange, onSiguiente }) {
   );
 }
 
-/* Campo reutilizable con label, input y mensaje de error */
 function Campo({ label, tipo, placeholder, valor, error, onChange, inputMode, autoComplete, maxLength }) {
   return (
     <div style={s.campoWrap}>
@@ -135,7 +155,7 @@ const s = {
     padding: "14px 16px",
     border: "1.5px solid var(--gris-borde)",
     borderRadius: "var(--radio-sm)",
-    fontSize: "16px",      /* 16px mínimo para evitar zoom en iOS */
+    fontSize: "16px",
     color: "var(--texto)",
     outline: "none",
     transition: "border-color 0.2s",
