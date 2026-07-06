@@ -3,10 +3,12 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    outDir: '../Voltaren-backend/Static',
+    emptyOutDir: true,
+  },
   server: {
     proxy: {
-      // En desarrollo: /api/* → http://localhost:8000/api/*
-      // En producción el backend sirve el build directamente, sin proxy
       '/api': 'http://localhost:8000',
     },
   },
