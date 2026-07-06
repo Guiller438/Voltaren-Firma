@@ -193,7 +193,7 @@ def listar_documentos(
 # El frontend de React hace client-side routing, así que todas las rutas
 # desconocidas deben devolver index.html (SPA fallback).
 
-STATIC_DIR = Path(__file__).parent.parent / "static"
+STATIC_DIR = Path(__file__).parent.parent / "Static"
 
 if STATIC_DIR.exists():
     app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True), name="static")
