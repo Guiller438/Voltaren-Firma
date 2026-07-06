@@ -103,11 +103,11 @@ async def registro(
         raise HTTPException(status_code=400, detail=f"Cédula inválida: {motivo}")
 
     # 2. Deduplicación — comprobamos antes de generar el PDF para no desperdiciar
-    # if database.cedula_ya_existe(cedula):
-    #    raise HTTPException(
-    #        status_code=409,
-    #        detail="Esta cédula ya tiene un documento registrado en el sistema.",
-    #    )
+    if database.cedula_ya_existe(cedula):
+        raise HTTPException(
+            status_code=409,
+            detail="Esta cédula ya tiene un documento registrado en el sistema.",
+        )
 
     # 3. Sanitizar inputs
     nombre_limpio   = sanitizar_nombre(nombres)
