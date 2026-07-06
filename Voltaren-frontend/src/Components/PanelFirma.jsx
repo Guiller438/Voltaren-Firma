@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SignatureCanvas from "react-signature-canvas";
 import Layout from "./Layout";
 
+
 /*
   Paso 3: firma digital y envío al backend.
 
@@ -64,7 +65,9 @@ export default function PanelFirma({ datos, onVolver }) {
     form.append("firma",    firmaBase64);
 
     try {
-      const res = await fetch("/api/registro", {
+      const API_URL = import.meta.env.VITE_API_URL || "";
+
+      const res = await fetch(`${API_URL}/api/registro`, {
         method: "POST",
         body: form,
       });

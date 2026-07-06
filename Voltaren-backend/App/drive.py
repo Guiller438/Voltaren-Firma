@@ -1,8 +1,20 @@
 """
-drive.py — Subida de PDFs a Google Drive usando OAuth de usuario.
+drive.py — Subida de PDFs a Google Drive.
+
+Soporta:
+1. Producción en Render usando variables de entorno:
+   - GOOGLE_OAUTH_CREDENTIALS
+   - GOOGLE_TOKEN_JSON
+
+2. Desarrollo local usando archivos:
+   - credentials_oauth.json
+   - token_drive.json
+
+3. Fallback local si Drive no está configurado.
 """
 
 import io
+import json
 import os
 from pathlib import Path
 
@@ -16,6 +28,7 @@ from googleapiclient.http import MediaIoBaseUpload
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 CREDENTIALS_PATH = BASE_DIR / "credentials_oauth.json"
 TOKEN_PATH = BASE_DIR / "token_drive.json"
 
@@ -25,35 +38,81 @@ PDF_LOCAL_DIR = BASE_DIR / "pdfs"
 _drive_service = None
 
 
+def _cargar_oauth_credentials():
+    """
+    Carga credenciales OAuth desde variable de entorno o archivo local.
+    """
+    oauth_env = os.environ.get("GOOGLE_OAUTH_CREDENTIALS")
+
+    if oauth_env:
+        return json.loads(oauth_env)
+
+    if CREDENTIALS_PATH.exists():
+        with open(CREDENTIALS_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    return None
+
+
+def _cargar_token():
+    """
+    Carga token OAuth desde variable de entorno o archivo local.
+    """
+    token_env = os.environ.get("GOOGLE_TOKEN_JSON")
+
+    if token_env:
+        return Credentials.from_authorized_user_info(
+            json.loads(token_env),
+            SCOPES,
+        )
+
+    if TOKEN_PATH.exists():
+        return Credentials.from_authorized_user_file(
+            str(TOKEN_PATH),
+            SCOPES,
+        )
+
+    return None
+
+
+def _guardar_token_local(creds: Credentials) -> None:
+    """
+    Guarda token localmente solo en desarrollo.
+    En Render no se debe escribir token persistente.
+    """
+    if os.environ.get("GOOGLE_TOKEN_JSON"):
+        return
+
+    with open(TOKEN_PATH, "w", encoding="utf-8") as token_file:
+        token_file.write(creds.to_json())
+
+
 def init_drive() -> None:
     global _drive_service
 
-    if not CREDENTIALS_PATH.exists():
-        print("⚠️ credentials_oauth.json no encontrado — Drive deshabilitado")
+    oauth_credentials = _cargar_oauth_credentials()
+    creds = _cargar_token()
+
+    if not oauth_credentials:
+        print("⚠️ OAuth credentials no configuradas — Drive deshabilitado")
         return
 
-    creds = None
+    if not creds:
+        print("⚠️ Token OAuth no configurado — Drive deshabilitado")
+        print("   En local ejecuta OAuth para generar token_drive.json.")
+        print("   En Render configura GOOGLE_TOKEN_JSON.")
+        return
 
-    if TOKEN_PATH.exists():
-        creds = Credentials.from_authorized_user_file(
-            str(TOKEN_PATH),
-            SCOPES
-        )
-
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
+    if not creds.valid:
+        if creds.expired and creds.refresh_token:
             creds.refresh(Request())
+            _guardar_token_local(creds)
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                str(CREDENTIALS_PATH),
-                SCOPES
-            )
-            creds = flow.run_local_server(port=0)
-
-        with open(TOKEN_PATH, "w", encoding="utf-8") as token_file:
-            token_file.write(creds.to_json())
+            print("⚠️ Token OAuth inválido y no se puede refrescar — Drive deshabilitado")
+            return
 
     _drive_service = build("drive", "v3", credentials=creds)
+
 
 def subir_pdf(pdf_bytes: bytes, nombre_archivo: str) -> str:
     if _drive_service is None:
@@ -63,8 +122,6 @@ def subir_pdf(pdf_bytes: bytes, nombre_archivo: str) -> str:
 
         with open(ruta_local, "wb") as f:
             f.write(pdf_bytes)
-
-        print(f"📄 PDF guardado localmente en: {ruta_local}")
 
         return f"local://pdfs/{nombre_archivo}"
 
@@ -98,5 +155,8 @@ def subir_pdf(pdf_bytes: bytes, nombre_archivo: str) -> str:
         },
     ).execute()
 
-    url = uploaded.get("webViewLink") or f"https://drive.google.com/file/d/{file_id}/view"
+    url = uploaded.get(
+        "webViewLink",
+        f"https://drive.google.com/file/d/{file_id}/view",
+    )
     return url
