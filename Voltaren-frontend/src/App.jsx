@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Formulario from "./components/Formulario";
-import Terminos   from "./components/Terminos";
-import PanelFirma from "./components/PanelFirma";
-import Gracias    from "./components/Gracias";
+import Formulario from "./Components/Formulario";
+import Terminos   from "./Components/Terminos";
+import PanelFirma from "./Components/PanelFirma";
+import Gracias    from "./Components/Gracias";
 
 /*
   App maneja el estado global del flujo:
