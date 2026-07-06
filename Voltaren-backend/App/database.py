@@ -33,7 +33,7 @@ def init_pool() -> None:
         host=os.environ["DB_HOST"],
         port=os.environ.get("DB_PORT", "5432"),
         # UTF-8 explícito para evitar que tildes y ñ se corrompan.
-        options="-c client_encoding=UTF8",
+        options="-c client_encoding=UTF8 -c timezone=America/Guayaquil",
     )
 
 
