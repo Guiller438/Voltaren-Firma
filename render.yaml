@@ -1,11 +1,10 @@
 services:
   - type: web
-    name: voltaren-firma
+    name: voltaren-backend
     runtime: python
-    buildCommand: |
-      pip install -r requirements.txt
-      apt-get install -y libreoffice
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    rootDir: Voltaren-backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn App.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DB_NAME
         sync: false
@@ -17,9 +16,11 @@ services:
         sync: false
       - key: DB_PORT
         sync: false
-      - key: GOOGLE_CREDENTIALS
-        sync: false
       - key: DRIVE_FOLDER_ID
         sync: false
       - key: HALEON_CONTACTO
+        sync: false
+      - key: GOOGLE_OAUTH_CREDENTIALS
+        sync: false
+      - key: GOOGLE_TOKEN_JSON
         sync: false
