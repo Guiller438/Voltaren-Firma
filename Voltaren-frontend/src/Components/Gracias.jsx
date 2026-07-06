@@ -66,7 +66,7 @@ const s = {
   logo: {
     height: "40px",
     objectFit: "contain",
-    filter: "brightness(0) invert(1)",
+    filter: "none",
   },
 
   cuerpo: {
