@@ -1,0 +1,34 @@
+/* Reset y base */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --naranja:      #E8622A;
+  --naranja-osc:  #C04E1E;
+  --azul:         #004AAD;
+  --azul-osc:     #002D72;
+  --gris-claro:   #F5F5F5;
+  --gris-borde:   #DDDDDD;
+  --texto:        #1A1A1A;
+  --texto-suave:  #555555;
+  --blanco:       #FFFFFF;
+  --error:        #D32F2F;
+  --exito:        #2E7D32;
+  --radio:        12px;
+  --radio-sm:     8px;
+  --sombra:       0 2px 16px rgba(0,0,0,0.10);
+}
+
+html, body {
+  width: 100%;
+  min-height: 100dvh;           /* dvh = dynamic viewport height, correcto en móvil */
+  background: linear-gradient(160deg, #FF8C00 0%, #E8622A 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  color: var(--texto);
+  -webkit-font-smoothing: antialiased;
+  /* Evita que el usuario haga zoom accidental al tocar inputs en iOS */
+  touch-action: manipulation;
+}
+
+/* Impide zoom en inputs en iOS sin deshabilitar zoom global */
+input, select, textarea { font-size: 16px; }

@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Entorno
+.env
+
+# OAuth Google
+credentials_oauth.json
+token_drive.json
+
+# PDFs generados
+pdfs/
+
+# Node
+node_modules/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
