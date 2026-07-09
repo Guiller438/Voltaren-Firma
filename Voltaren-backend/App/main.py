@@ -86,12 +86,11 @@ async def registro(
 
     Recibe los datos del formulario (React) y:
       1. Valida la cédula con el algoritmo módulo 10.
-      2. Verifica que la cédula no esté ya registrada.
-      3. Sanitiza nombre y contacto.
-      4. Genera el PDF con el template oficial.
-      5. Sube el PDF a Google Drive.
-      6. Guarda el registro en PostgreSQL.
-      7. Devuelve la URL del PDF al frontend.
+      2. Sanitiza nombre y contacto.
+      3. Genera el PDF con el template oficial.
+      4. Sube el PDF a Google Drive.
+      5. Guarda el registro en PostgreSQL.
+      6. Devuelve la URL del PDF al frontend.
 
     Todos los errores de validación devuelven 400 con un mensaje claro
     para que el frontend pueda mostrárselo al participante en pantalla.
@@ -101,13 +100,6 @@ async def registro(
     ok, motivo = validar_cedula(cedula.strip())
     if not ok:
         raise HTTPException(status_code=400, detail=f"Cédula inválida: {motivo}")
-
-    # 2. Deduplicación — comprobamos antes de generar el PDF para no desperdiciar
-    if database.cedula_ya_existe(cedula):
-        raise HTTPException(
-            status_code=409,
-            detail="Esta cédula ya tiene un documento registrado en el sistema.",
-        )
 
     # 3. Sanitizar inputs
     nombre_limpio   = sanitizar_nombre(nombres)
