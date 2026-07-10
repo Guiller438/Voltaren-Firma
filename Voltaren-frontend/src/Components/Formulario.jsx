@@ -7,7 +7,8 @@ function validarCedula(cedula) {
   if (!/^\d+$/.test(cedula)) return "La cédula debe contener solo números";
 
   const provincia = parseInt(cedula.slice(0, 2));
-  if (provincia < 1 || provincia > 24) return "Código de provincia inválido";
+  const provinciasValidas = new Set([...Array(24).keys()].map(n => n + 1).concat(30)); // 1-24 + 30
+  if (!provinciasValidas.has(provincia)) return "Código de provincia inválido";
 
   const tercero = parseInt(cedula[2]);
   if (tercero >= 6) return "Cédula inválida";
