@@ -38,7 +38,8 @@ def validar_cedula(cedula: str) -> tuple[bool, str]:
         return False, f"La cédula debe tener 10 dígitos (recibidos: {len(cedula)})"
 
     provincia = int(cedula[:2])
-    if provincia < 1 or provincia > 24:
+    PROVINCIAS_VALIDAS = set(range(1, 25)) | {30}  # 01-24 + 30 (consulados/gobierno central)
+    if provincia not in PROVINCIAS_VALIDAS:
         return False, f"Código de provincia inválido ({cedula[:2]})"
 
     tercer_digito = int(cedula[2])
